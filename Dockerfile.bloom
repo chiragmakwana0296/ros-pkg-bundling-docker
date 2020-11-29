@@ -26,20 +26,18 @@ RUN source /opt/ros/$ROS_DISTRO/setup.bash \
             && rosdep install -y --from-paths . --ignore-src --rosdistro $ROS_DISTRO \
             && catkin_make
 
-ENV OS-NAME=$"(lsb_release -d)"
-ENV OS-VERSION=$"(lsb_release -c)"
-# RUN for pkg in */; \
-#         do \
-#             echo "$pkg" \
-#             && cd $pkg \
-#             && pwd \
-#             && bloom-generate rosdebian --os-name ${OS-NAME} --os-version ${OS-VERSION} --ros-distro ${ROS_DISTRO} \
-#             && cd .. ; \
-#         done 
+RUN export OS_NAME=$(lsb_release -i -s)
+RUN export OS_VERSION=$(lsb_release -c -s)
+RUN echo $OS_NAME 
+RUN for pkg in */; \
+        do \
+            echo "$pkg" \
+            && cd $pkg \
+            && pwd \
+            && bloom-generate rosdebian --os-name ${OS_NAME} --os-version ${OS_VERSION} --ros-distro ${ROS_DISTRO} \
+            && cd .. ; \
+        done 
 
-
-
-COPY ./scripts/entrypoint.sh /
 COPY ./scripts/entrypoint-devel.sh /
 COPY ./scripts/ros-app.launch /
 
