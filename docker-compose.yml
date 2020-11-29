@@ -13,7 +13,7 @@ services:
       args:
         - ROS_DISTRIBUTION=kinetic
         - BUILD_TYPE=devel
-    container_name: ros-devel
+    container_name: ros-bloom
     stdin_open: true
     tty: true
     network_mode: "host"
