@@ -37,7 +37,7 @@ RUN for pkg in */; \
             && bloom-generate rosdebian --os-name ${OS_NAME} --os-version ${OS_VERSION} --ros-distro ${ROS_DISTRO} \
             && cd .. ; \
         done 
-
+RUN fakeroot debian/rules binary
 COPY ./scripts/entrypoint-devel.sh /
 COPY ./scripts/ros-app.launch /
 
