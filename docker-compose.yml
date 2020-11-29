@@ -1,11 +1,11 @@
 version: "3.8"
 services:
   ######################################################################################
-  ## Container for ROS-Devel Workspace
-  ## command: sudo docker-compose up ros-devel
+  ## Container for ROS-Bloom deb package generation
+  ## command: sudo docker-compose up ros-bloom
   ## Args:  - ROS_DISTRIBUTION=kinetic | meliodic | noetic
   ##        - BUILD_TYPE= devel | install
-  ##########################################################################git ch############
+  ######################################################################################
   ros-bloom:
     build:
       context: .
