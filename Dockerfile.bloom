@@ -1,0 +1,50 @@
+ARG ROS_DISTRIBUTION
+FROM ros:$ROS_DISTRIBUTION-ros-base
+
+LABEL mantainer="chiragmakwana02@gmail.com"
+
+SHELL ["/bin/bash","-c"]
+COPY ./requirements /requirements
+
+RUN ls requirements
+# install required deb packages
+RUN apt-get update && cat /requirements/deb-packages.txt | xargs apt-get install -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
+
+
+#ROS workspace
+ARG BUILD_TYPE
+ENV BUILD_ENV=${BUILD_TYPE}
+ENV CATKIN_WS=/root/catkin_ws
+RUN mkdir -p $CATKIN_WS/src
+WORKDIR $CATKIN_WS/src
+COPY ./src .
+
+# build and install packages
+RUN source /opt/ros/$ROS_DISTRO/setup.bash \
+            && apt-get update \
+            && cd $CATKIN_WS \
+            && rosdep install -y --from-paths . --ignore-src --rosdistro $ROS_DISTRO \
+            && catkin_make
+
+RUN export OS_NAME=$(lsb_release -i -s)
+RUN export OS_VERSION=$(lsb_release -c -s)
+RUN echo $OS_NAME 
+RUN for pkg in */; \
+        do \
+            echo "$pkg" \
+            && cd $pkg \
+            && pwd \
+            && bloom-generate rosdebian --os-name ${OS_NAME} --os-version ${OS_VERSION} --ros-distro ${ROS_DISTRO} \
+            && cd .. ; \
+        done 
+
+COPY ./scripts/entrypoint-devel.sh /
+COPY ./scripts/ros-app.launch /
+
+# EXPOSE 11311
+# EXPOSE 19997
+
+# WORKDIR /root/catkin_ws
+# ENTRYPOINT ["/entrypoint.sh"]
+# CMD ["bash source /entrypoint.sh"]
+
